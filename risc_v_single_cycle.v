@@ -284,5 +284,16 @@ HazardDetectionUnit hazard_detection (
     .branch_taken_EX(branch_taken_EX), .Branch_EX(Branch_EX), .Jump_EX(Jump_EX),
     .stall(stall), .flush_ID(flush_ID), .flush_EX(flush_EX)
 );
-
+    wire [31:0] counter_cycle;
+    wire [31:0] counter_inst;
+    wire [31:0] pc_max = 32'h0;
+    
+    assign pc_max = (pc_max <= PC_EX) ? PC_EX : pc_max;
+    
+    always@ (posedge clk or posedge rst) begin
+        if(rst) counter_cycle <= 0 ;
+        else begin 
+            counter_cycle <= counter_cycle + 1;
+            counter_inst  <= pc_max / 4;
+    end
 endmodule
