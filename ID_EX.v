@@ -7,6 +7,7 @@ module ID_EX (
     input             RegWrite_in, ALUSrc_in, ALUSrc_pc_in,
     input             MemWrite_in, MemRead_in, Branch_in, Jump_in,
     input      [1:0]  ResultSrc_in, ALUOp_in,
+    input      [31:0] instruction_in,   
  
     output reg [31:0] PC_out, dataA_out, dataB_out, imm_ext_out,
     output reg [4:0]  addA_out, addB_out, addD_out,
@@ -14,7 +15,8 @@ module ID_EX (
     output reg [6:0]  funct7_out, op_out,        // FIX: thêm 2 port này
     output reg        RegWrite_out, ALUSrc_out, ALUSrc_pc_out,
     output reg        MemWrite_out, MemRead_out, Branch_out, Jump_out,
-    output reg [1:0]  ResultSrc_out, ALUOp_out
+    output reg [1:0]  ResultSrc_out, ALUOp_out,
+    output reg [31:0] instruction_out  
 );
     always @(posedge clk or posedge rst) begin
         if (rst || flush) begin
@@ -24,6 +26,7 @@ module ID_EX (
             RegWrite_out <= 0; ALUSrc_out <= 0; ALUSrc_pc_out <= 0;
             MemWrite_out <= 0; MemRead_out <= 0;
             ResultSrc_out <= 0; Branch_out <= 0; Jump_out <= 0; ALUOp_out <= 0;
+            instruction_out <= 0;
         end else begin
             PC_out        <= PC_in;
             dataA_out     <= dataA_in;
@@ -44,6 +47,7 @@ module ID_EX (
             Branch_out    <= Branch_in;
             Jump_out      <= Jump_in;
             ALUOp_out     <= ALUOp_in;
+            instruction_out <= instruction_in;
         end
     end
 endmodule
