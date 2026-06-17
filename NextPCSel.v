@@ -5,5 +5,5 @@ module NextPCSel(
     input branch_taken,
     output [31:0] next_PC
 );
-    assign next_PC = (Branch && branch_taken) || Jump ? PC_branch : PC_plus4;
+    assign next_PC = ((Branch && branch_taken) || Jump) ? PC_branch : PC_plus4;
 endmodule
