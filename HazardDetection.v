@@ -1,6 +1,6 @@
 module HazardDetectionUnit (
     input [4:0] rs1_ID, rs2_ID, rd_EX,
-    input MemRead_EX, branch_taken_ID, Branch_ID, Jump_ID,
+    input MemRead_EX, branch_taken_EX, Branch_EX, Jump_EX,
     output reg stall, flush_ID, flush_EX
 );
     always @(*) begin
@@ -11,7 +11,7 @@ module HazardDetectionUnit (
             flush_EX = 1'b1;
         end
         // Control hazard (branch/jump taken)
-        else if ((Branch_ID && branch_taken_ID) || Jump_ID) begin
+        else if ((Branch_EX && branch_taken_EX) || Jump_EX) begin
             stall = 1'b0;
             flush_ID = 1'b1;
             flush_EX = 1'b1;
