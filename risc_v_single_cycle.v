@@ -197,6 +197,11 @@ MUX3 mux_forwardB (
     .select(forwardB), .out(forwardB_data)
 );
 
+MUX2 mux_alu1 (
+    .input0(forwardA_data), .input1(PC_EX),
+    .select(ALUSrc_pc_EX), .out(alu_A)
+);
+    
 MUX2 mux_alu2 (
     .input0(forwardB_data), .input1(imm_ext_EX),
     .select(ALUSrc_EX), .out(alu_B)
