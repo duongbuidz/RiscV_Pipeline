@@ -296,6 +296,5 @@ HazardDetectionUnit hazard_detection (
         if(rst) counter_cycle <= 0 ;
         else begin 
             counter_cycle <= counter_cycle + 1;
-            counter_inst  <= pc_max / 4;
     end
 endmodule
