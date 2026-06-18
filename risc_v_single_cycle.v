@@ -286,9 +286,6 @@ HazardDetectionUnit hazard_detection (
 );
     wire [31:0] counter_cycle;
     wire [31:0] counter_inst;
-    wire [31:0] pc_max = 32'h0;
-    
-    assign pc_max = (pc_max <= PC_MEM) ? PC_MEM : pc_max;
     
     always@ (posedge clk or posedge rst) begin
         if(rst) counter_cycle <= 0 ;
