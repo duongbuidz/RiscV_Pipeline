@@ -245,28 +245,36 @@ EX_MEM ex_mem (
 // --------------------------------------------------------------------------
 // MEM Stage
 // --------------------------------------------------------------------------
+
+wire [31:0] uart_read_data;
+wire uart_region = (alu_out_MEM >= 32'h10000000 && alu_out_MEM <= 32'h1000001F);
+uart uart_periph (
+.clk,
+.rst,
+.addr(alu_out_MEM),
+.write_data(dataB_MEM),
+.mem_write(MemWrite MEM && uart_region), .mem_read(MemRead_MEM && uart_region), .read_data(uart_read_data),
+.cycle_counter(cycle_counter),
+.uart tx
 DMEM dmem (
-    .clk(clk), .rst(rst),
-    .MemRead(MemRead_MEM), .MemWrite(MemWrite_MEM),
-    .funct3(funct3_MEM),
-    .address(alu_out_MEM), .write_data(dataB_MEM),
-    .read_data(read_data_MEM)
 );
-
+.clk(clk), .rst(rst),
+.MemRead (MemRead_MEM && !uart_region), .MemWrite(MemWrite MEM && !uart_region), .funct3(funct3_MEM),
+.address (alu_out_MEM), .write_data(dataB_MEM), .read_data(read_data_MEM)
 PCAdder pc_adder2 (
-    .PC_in(PC_MEM),
-    .PC_plus4(PC_plus4_MEM)
+.PC_in(PC_MEM),
+.PC_plus4(PC_plus4_MEM)
 );
-
-// --------------------------------------------------------------------------
+//
 // MEM/WB Pipeline Register
-// --------------------------------------------------------------------------
-MEM_WB mem_wb (
-    .clk(clk), .rst(rst),
-    .PC_plus4_in(PC_plus4_MEM), .alu_out_in(alu_out_MEM), .read_data_in(read_data_MEM),
-    .addD_in(addD_MEM), .RegWrite_in(RegWrite_MEM), .ResultSrc_in(ResultSrc_MEM),
-    .PC_plus4_out(PC_plus4_WB), .alu_out_out(alu_out_WB), .read_data_out(read_data_WB),
-    .addD_out(addD_WB), .RegWrite_out(RegWrite_WB), .ResultSrc_out(ResultSrc_WB)
+//
+MEM WB mem wb (
+.clk(clk), .rst(rst), .PC_plus4_in(PC_plus4_MEM), .alu_out_in(alu_out_MEM),
+.read_data_in(uart_region? uart_read_data:read_data_MEM),
+.addD_in (addD_MEM), .RegWrite in (RegWrite_MEM), .ResultSrc_in (ResultSrc_MEM),
+.PC_plus4_out(PC_plus4_WB), .alu_out_out(alu_out_WB), .read data out (read_data_WB), .addD_out(addD_WB),
+.RegWrite_out (RegWrite_WB),
+.ResultSrc_out(ResultSrc_WB)
 );
 
 // --------------------------------------------------------------------------
