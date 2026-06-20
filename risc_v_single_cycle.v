@@ -56,7 +56,10 @@ reg [31:0] WB_reg;
 
 // --- HAZARD SIGNAL ---
 wire stall, flush_ID, flush_EX;
-
+// counter
+reg [31:0] cycle_instr;
+reg [31:0] cycle_counter;
+reg [31:0] nop_counter;
 // FIX: thêm Stall Signal để giữ nguyên PC khi Stall
 pc pc (
     .clk(clk), .rst(rst),
@@ -314,12 +317,20 @@ HazardDetectionUnit hazard_detection (
     .branch_taken_EX(branch_taken_EX), .Branch_EX(Branch_EX), .Jump_EX(Jump_EX),
     .stall(stall), .flush_ID(flush_ID), .flush_EX(flush_EX)
 );
-    wire [31:0] counter_cycle;
-    wire [31:0] counter_inst;
-    
-    always@ (posedge clk or posedge rst) begin
-        if(rst) counter_cycle <= 0 ;
-        else begin 
-            counter_cycle <= counter_cycle + 1;
+
+always @(posedge clk or posedge rst) begin
+    if(rst) begin
+        cycle_counter <= 0;
+        cycle_instr = 0;
+        nop_counter = 0;
     end
+    else begin
+        if(instruction_EX == 32'h00000013) nop_counter <= nop_counter + 1;
+            if(nop_counter < 4) begin
+                cycle_counter cycle_counter + 1;
+                if ((RegWrite_WB || ResultSrc_WB != 2'b00) && (!flush_EX) && (!stall)) begin cycle_instr = cycle_instr + 1; end
+            end
+        end
+    end
+    
 endmodule
