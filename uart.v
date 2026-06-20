@@ -29,11 +29,11 @@ uart_tx tx_core (
 
 always @(posedge clk or posedge rst) begin
   if(rst) begin
-    tx data <= 0;
-    tx send <= 0;
+    tx_data <= 0;
+    tx_send <= 0;
   end else begin
-    tx send <= 1'b0;
-    mem_write_d <= mem write;
+    tx_send <= 1'b0;
+    mem_write_d <= mem_write;
     if(mem_write && !mem_write_d && addr == UART_TX_DATA && tx_ready) begin
       tx_data = write_data[7:0];
       tx_send <= 1'bl;
@@ -42,7 +42,7 @@ always @(posedge clk or posedge rst) begin
 end
 
 always @(*) begin
-  read data = 32'h0;
+  read_data = 32'h0;
   if(mem_read) begin
     if(addr == UART_TX_STATUS)
       read_data = {31'b0, tx_ready);
