@@ -4,7 +4,7 @@ module DMEM (
     input [31:0] address, write_data,
     output reg [31:0] read_data
 );
-    reg [7:0] dmem [0:1023]; // 256 word = 1024 byte
+    reg [7:0] dmem [0:16383]; // 256 word = 1024 byte
     integer k;
 
 wire [7:0] x0;
