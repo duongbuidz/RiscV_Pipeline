@@ -249,18 +249,20 @@ EX_MEM ex_mem (
 wire [31:0] uart_read_data;
 wire uart_region = (alu_out_MEM >= 32'h10000000 && alu_out_MEM <= 32'h1000001F);
 uart uart_periph (
-.clk,
-.rst,
-.addr(alu_out_MEM),
-.write_data(dataB_MEM),
-.mem_write(MemWrite MEM && uart_region), .mem_read(MemRead_MEM && uart_region), .read_data(uart_read_data),
-.cycle_counter(cycle_counter),
-.uart tx
-DMEM dmem (
+    .clk,
+    .rst,
+    .addr(alu_out_MEM),
+    .write_data(dataB_MEM),
+    .mem_write(MemWrite MEM && uart_region), .mem_read(MemRead_MEM && uart_region), .read_data(uart_read_data),
+    .cycle_counter(cycle_counter),
+    .uart_tx
 );
-.clk(clk), .rst(rst),
-.MemRead (MemRead_MEM && !uart_region), .MemWrite(MemWrite MEM && !uart_region), .funct3(funct3_MEM),
-.address (alu_out_MEM), .write_data(dataB_MEM), .read_data(read_data_MEM)
+
+DMEM dmem (
+    .clk(clk), .rst(rst),
+    .MemRead (MemRead_MEM && !uart_region), .MemWrite(MemWrite MEM && !uart_region), .funct3(funct3_MEM),
+    .address (alu_out_MEM), .write_data(dataB_MEM), .read_data(read_data_MEM)
+);
 PCAdder pc_adder2 (
 .PC_in(PC_MEM),
 .PC_plus4(PC_plus4_MEM)
