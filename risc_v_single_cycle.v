@@ -1,5 +1,6 @@
 module risc_v_single_cycle (
-    input clk, rst
+    input clk, rst,
+    output uart_tx
 );
 
 // --- Wires IF stage ---
@@ -224,10 +225,14 @@ assign dataB_forwarded_EX = forwardB_data;
 // FIX: bỏ RegWrite_EX (không cần, không kết nối ở top)
 // --------------------------------------------------------------------------
 ForwardingUnit forwarding_unit (
-    .rs1_EX(addA_EX), .rs2_EX(addB_EX),
-    .rd_MEM(addD_MEM), .rd_WB(addD_WB),
-    .RegWrite_MEM(RegWrite_MEM), .RegWrite_WB(RegWrite_WB),
-    .forwardA(forwardA), .forwardB(forwardB)
+    .rs1_EX(addA_EX), 
+    .rs2_EX(addB_EX),
+    .rd_MEM(addD_MEM), 
+    .rd_WB(addD_WB),
+    .RegWrite_MEM(RegWrite_MEM), 
+    .RegWrite_WB(RegWrite_WB),
+    .forwardA(forwardA), 
+    .forwardB(forwardB)
 );
 
 // --------------------------------------------------------------------------
@@ -235,13 +240,22 @@ ForwardingUnit forwarding_unit (
 // --------------------------------------------------------------------------
 EX_MEM ex_mem (
     .clk(clk), .rst(rst),
-    .PC_in(PC_EX), .alu_out_in(alu_out_EX), .dataB_in(dataB_forwarded_EX),
-    .addD_in(addD_EX), .funct3_in(funct3_EX),
-    .RegWrite_in(RegWrite_EX), .MemWrite_in(MemWrite_EX), .MemRead_in(MemRead_EX),
+    .PC_in(PC_EX), .alu_out_in(alu_out_EX), 
+    .dataB_in(dataB_forwarded_EX),
+    .addD_in(addD_EX), 
+    .funct3_in(funct3_EX),
+    .RegWrite_in(RegWrite_EX), 
+    .MemWrite_in(MemWrite_EX), 
+    .MemRead_in(MemRead_EX),
     .ResultSrc_in(ResultSrc_EX),
-    .PC_out(PC_MEM), .alu_out_out(alu_out_MEM), .dataB_out(dataB_MEM),
-    .addD_out(addD_MEM), .funct3_out(funct3_MEM),
-    .RegWrite_out(RegWrite_MEM), .MemWrite_out(MemWrite_MEM), .MemRead_out(MemRead_MEM),
+    .PC_out(PC_MEM), 
+    .alu_out_out(alu_out_MEM), 
+    .dataB_out(dataB_MEM),
+    .addD_out(addD_MEM), 
+    .funct3_out(funct3_MEM),
+    .RegWrite_out(RegWrite_MEM), 
+    .MemWrite_out(MemWrite_MEM), 
+    .MemRead_out(MemRead_MEM),
     .ResultSrc_out(ResultSrc_MEM)
 );
 
@@ -257,7 +271,7 @@ uart uart_periph (
     .rst,
     .addr(alu_out_MEM),
     .write_data(dataB_MEM),
-    .mem_write(MemWrite MEM && uart_region), 
+    .mem_write(MemWrite_MEM && uart_region), 
     .mem_read(MemRead_MEM && uart_region), 
     .read_data(uart_read_data),
     .cycle_counter(cycle_counter),
@@ -266,10 +280,10 @@ uart uart_periph (
 
 DMEM dmem (
     .clk(clk), .rst(rst),
-    .MemRead (MemRead_MEM && !uart_region), 
-    .MemWrite(MemWrite MEM && !uart_region), 
+    .MemRead(MemRead_MEM && !uart_region), 
+    .MemWrite(MemWrite_MEM && !uart_region), 
     .funct3(funct3_MEM),
-    .address (alu_out_MEM), 
+    .address(alu_out_MEM), 
     .write_data(dataB_MEM), 
     .read_data(read_data_MEM)
 );
@@ -286,14 +300,14 @@ MEM_WB mem_wb (
     .PC_plus4_in(PC_plus4_MEM), 
     .alu_out_in(alu_out_MEM),
     .read_data_in(uart_region ? uart_read_data : read_data_MEM),
-    .addD_in (addD_MEM), 
-    .RegWrite in (RegWrite_MEM), 
-    .ResultSrc_in (ResultSrc_MEM),
+    .addD_in(addD_MEM), 
+    .RegWrite_in(RegWrite_MEM), 
+    .ResultSrc_in(ResultSrc_MEM),
     .PC_plus4_out(PC_plus4_WB), 
     .alu_out_out(alu_out_WB), 
-    .read data out (read_data_WB), 
+    .read_data_out(read_data_WB), 
     .addD_out(addD_WB),
-    .RegWrite_out (RegWrite_WB),
+    .RegWrite_out(RegWrite_WB),
     .ResultSrc_out(ResultSrc_WB)
 );
 
@@ -327,7 +341,7 @@ always @(posedge clk or posedge rst) begin
     else begin
         if(instruction_EX == 32'h00000013) nop_counter <= nop_counter + 1;
             if(nop_counter < 4) begin
-                cycle_counter cycle_counter + 1;
+                cycle_counter < cycle_counter + 1;
                 if ((RegWrite_WB || ResultSrc_WB != 2'b00) && (!flush_EX) && (!stall)) begin cycle_instr = cycle_instr + 1; end
             end
         end
