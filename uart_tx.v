@@ -25,10 +25,10 @@ reg [7:0] data_reg;
 always @(posedge clk or posedge rst) begin
   if (rst) begin
     state <= S IDLE;
-    tx <<= 1'bl;
-    ready <<= 1'bl;
-    counter = 0;
-    bit idx = 0;
+    tx <= 1'bl;
+    ready <= 1'bl;
+    counter <= 0;
+    bit_idx <= 0;
     data_reg <= 0;
   end else begin
     case (state)
@@ -47,31 +47,31 @@ always @(posedge clk or posedge rst) begin
         tx <= 1'b0;
         if (counter == DIVISOR 1) begin
           counter <= 0;
-          bit idx <= 0;
+          bit_idx <= 0;
           state <= S_DATA;
         end else
-          counter = counter + 1;
+          counter <= counter + 1;
         end
       // DATA BITS: do before, d7 after 
       S_DATA: begin
         tx <= data_reg[bit_idx];
         if (counter == DIVISOR - 1) begin
           counter <= 0;
-        if (bit idx == 7)
+          if (bit_idx == 7)
           state <= S_STOP;
         else
           bit_idx <= bit_idx + 1;
         end else
-          counter = counter + 1;
+          counter <= counter + 1;
         end
       // STOP BIT (tx=1, extend DIVISOR cycle)
       S_STOP: begin
         tx <= 1'b1;
         if (counter == DIVISOR 1) begin
           counter <= 0;
-          state <= S IDLE; // ready=1 in the next cycle (S IDLE)
+          state <= S_IDLE; // ready=1 in the next cycle (S IDLE)
         end else
-          counter = counter + 1;
+          counter <= counter + 1;
         end
     endcase
   end
