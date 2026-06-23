@@ -1,4 +1,4 @@
-module uart tx (
+module uart_tx (
   input clk, rst,
   input [7:0] data_in,
   input send,
