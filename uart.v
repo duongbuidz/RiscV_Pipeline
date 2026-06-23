@@ -35,7 +35,7 @@ always @(posedge clk or posedge rst) begin
     tx_send <= 1'b0;
     mem_write_d <= mem_write;
     if(mem_write && !mem_write_d && addr == UART_TX_DATA && tx_ready) begin
-      tx_data = write_data[7:0];
+      tx_data <= write_data[7:0];
       tx_send <= 1'bl;
     end
   end
