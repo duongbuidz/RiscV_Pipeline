@@ -8,5 +8,5 @@ module IMEM (
         $readmemh("program.hex", imem);   // flex with file hex name
     end
  
-    assign instruction = imem[PC_Out[9:2]]; // word-addressed, combinational
+    assign instruction = imem[PC_Out[13:2]]; // word-addressed, combinational
 endmodule
