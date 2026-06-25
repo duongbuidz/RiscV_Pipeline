@@ -332,17 +332,72 @@ HazardDetectionUnit hazard_detection (
     .stall(stall), .flush_ID(flush_ID), .flush_EX(flush_EX)
 );
 
+
+
+reg [2:0] inst_type_EX, inst_type_MEM, inst_type_WB;
+wire commit;
+
+assign commit = (inst_type_WB != 3'd7);//
+
+always @(posedge clk) begin
+    // ID → EX
+    if (flush ID)
+        inst_type_EX = 3'd7;
+    else if (!stall)
+        inst_type_EX <= inst_type_ID;
+    // EX → MEM
+    if (flush EX)
+        inst_type_MEM <= 3'd7;
+    else
+        inst_type_MEM <= inst_type_EX;
+    // MEM → WB
+        inst_type_WB <= inst_type_MEM;
+end
+
+//
+
+reg [31:0] cnt_alu;
+reg [31:0] cnt_load;
+reg [31:0] cnt_store;
+reg [31:0] cnt_branch;
+reg [31:0] cnt_jump;
+reg [31:0] cnt_u;
+
+always @(posedge clk or negedge rst_n) begin
+if (~rst_n) begin
+    cnt alu = 0;
+    cnt load = 0;
+    cnt store = 0;
+    cnt_branch <= 0;
+    cnt_jump <= 0;
+    cnt u = 0;
+end
+else
+    if(Branch_EX) cnt_branch <= cnt_branch + 1;
+    if(Jump_EX) cnt_jump <= cnt_jump + 1;
+    if (commit) begin
+        case (inst_type_WB)
+            3'd0: cnt alu <<= cnt alu + 1;
+            3'd1: cnt load <<= cnt load + 1;
+            3'd2: cnt store <= cnt_store + 1;
+// 3'd3: cnt_branch <= cnt_branch + 1;
+// 3'd4: cnt_jump <= cnt_jump + 1;
+            3'd5: cnt u <<= cnt u + 1;
+        endcase
+    end
+end
+assign cycle instr = cnt_u + cnt_alu + cnt_jump + cnt_load + cnt_branch + cnt_store;
+
+    
 always @(posedge clk or posedge rst) begin
     if(rst) begin
         cycle_counter <= 0;
-        cycle_instr = 0;
         nop_counter = 0;
     end
     else begin
         if(instruction_EX == 32'h00000013) nop_counter <= nop_counter + 1;
             if(nop_counter < 4) begin
                 cycle_counter < cycle_counter + 1;
-                if ((RegWrite_WB || ResultSrc_WB != 2'b00) && (!flush_EX) && (!stall)) begin cycle_instr = cycle_instr + 1; end
             end
         end
     end
